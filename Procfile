@@ -1,1 +1,1 @@
-worker: python /srcs/GeoBot/main.py
+worker: python main.py
