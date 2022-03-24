@@ -1,5 +1,4 @@
 import telebot
-from telebot import types
 import requests
 # from telegram import Updater, CommandHandler
 
