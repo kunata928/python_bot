@@ -1,0 +1,1 @@
+worker: python /srcs/GeoBot/main.py
