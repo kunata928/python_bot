@@ -1,6 +1,6 @@
 import telebot
 import requests
-import pyTelegramBotAPI
+# import pyTelegramBotAPI
 # from telegram import Updater, CommandHandler
 
 TOKEN = "2032032327:AAFoTSbbdRkdcZTD4Q2ASsX3nuUWobzJW8M"
@@ -54,7 +54,7 @@ def start(message, bot):
 
 
 def main():
-    bot = telebot.TeleBot(TOKEN, parse_mode=None)  # You can set parse_mode by default. HTML or MARKDOWN
+    bot = telebot.TeleBot(TOKEN)  # You can set parse_mode by default. HTML or MARKDOWN
 
     @bot.message_handler(commands=['start', 'help'])
     def send_welcome(message):
