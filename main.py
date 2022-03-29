@@ -1,34 +1,13 @@
 import telebot
 import requests
-# import pyTelegramBotAPI
-# from telegram import Updater, CommandHandler
+import settings as stg
+import srcs.GeoBot.parser_text_reminder
 
-TOKEN = "2032032327:AAFoTSbbdRkdcZTD4Q2ASsX3nuUWobzJW8M"
-
-url = 'https://openexchangerates.org/api/latest.json?app_id=1220e55ab6db41adb27d87036ec6dd40'
-# data = requests.get(url) # requests data from API
-# data = data.json() # converts return data to json
-
-
-WEATHER_URL = 'http://api.weatherstack.com/current?access_key=11c620b45d1e94840308f10d8fc44724'
-WEATHER_PARAMS0 = {'query':'Istanbul'}
-WEATHER_PARAMS1 = {'query':'Krakow'}
-WEATHER_PARAMS2 = {'query':'Moskva'}
-
-
-
-# print(weather.json()['current']['temperature']) # will print only the temperature; print without indexing to see all the values returned!
-# Retrieve values from API
-
-# pln_rate = data['rates']['PLN']
-# eur_rate = data['rates']['EUR']
-# rub_rate = data['rates']['RUB']
-# try_rate = data['rates']['TRY']
 
 def return_weather():
-    weather0 = requests.get(WEATHER_URL, params=WEATHER_PARAMS0)
-    weather1 = requests.get(WEATHER_URL, params=WEATHER_PARAMS1)
-    weather2 = requests.get(WEATHER_URL, params=WEATHER_PARAMS2)
+    weather0 = requests.get(stg.WEATHER_URL, params=stg.WEATHER_PARAMS0)
+    weather1 = requests.get(stg.WEATHER_URL, params=stg.WEATHER_PARAMS1)
+    weather2 = requests.get(stg.WEATHER_URL, params=stg.WEATHER_PARAMS2)
     curr0_temp = weather0.json()['current']['temperature']
     curr1_temp = weather1.json()['current']['temperature']
     curr2_temp = weather2.json()['current']['temperature']
@@ -37,7 +16,7 @@ def return_weather():
 
 
 def return_rates():
-    data = requests.get(url)  # requests data from API
+    data = requests.get(stg.EXCHANGE_URL)  # requests data from API
     data = data.json()
     pln_rate = data['rates']['PLN']
     eur_rate = data['rates']['EUR']
@@ -59,13 +38,44 @@ def start(message, bot):
     bot.send_message(message.from_user.id, text='Hi! I respond to /weather and /currency. Try these!')
 
 
-def main():
-    bot = telebot.TeleBot(TOKEN)  # You can set parse_mode by default. HTML or MARKDOWN
+def add_remind(message, bot):
+    bot.send_message(message.from_user.id, text='If you want to add a remind, type message like: '"<In/After> <time> <msg>"
+                                                '"In 18:00 go to gym"'
+                                                'or "After 5h/min remind to drink water"')
+    bot.register_next_step_handler(message, bot, req_reminde)
 
+
+def parse_message(str):
+    pass
+
+
+def req_reminde(message, bot):
+    parse_message(message.text)
+
+
+def show_list_reminds(message, bot):
+    pass
+
+
+def remove_remind(message, bot):
+    pass
+
+
+def main():
+    bot = telebot.TeleBot(stg.TOKEN_TG_BOT)  # You can set parse_mode by default. HTML or MARKDOWN
 
     @bot.message_handler(commands=['start', 'help'])
     def send_welcome(message):
         start(message, bot)
+
+    @bot.message_handler(commands=['add', 'list', 'remove'])
+    def set_reminder(message):
+        if message.text == "/add":
+            add_remind(message, bot)
+        elif message.text == "/list":
+            show_list_reminds(message, bot)
+        elif message.text == "/remove":
+            remove_remind(message, bot)
 
     @bot.message_handler(func=lambda m: True)
     def echo_all(message):
@@ -75,11 +85,6 @@ def main():
             currency(message, bot)
         else:
             start(message, bot)
-
-    # PORT = int(os.environ.get('PORT', '443'))
-    # HOOK_URL = 'YOUR-CODECAPSULES-URL-HERE' + '/' + TOKEN
-    # bot.start_webhook(listen='0.0.0.0', port=PORT, url_path=TOKEN, webhook_url=HOOK_URL)
-    # bot.idle()
     bot.infinity_polling()
 
 
