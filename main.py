@@ -39,9 +39,8 @@ def start(message, bot):
 
 
 def add_remind(message, bot):
-    bot.send_message(message.from_user.id, text='If you want to add a remind, type message like: '"<In/After> <time> <msg>"
-                                                '"In 18:00 go to gym"'
-                                                'or "After 5h/min remind to drink water"')
+    bot.send_message(message.from_user.id, text='If you want to add a remind, type message like: '"<After> <time> <msg>"
+                                                '"After 5 h/min remind to drink water"')
     bot.register_next_step_handler(message, bot, req_reminde)
 
 

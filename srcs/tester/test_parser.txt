@@ -1,7 +1,9 @@
 
 asdf
-In
 After
+after 10 minutes
+after 10 min remind make coffee
+
 18:00
 12
 45
@@ -20,7 +22,10 @@ In 1 8  : 0  0 go to gym
 In 18: 00 go to gym
 In 18 :00 go to gym
 In 18:00 go to gym
-After 5 go to gym
-After 10 go to gym
-After 24 go to gym
-After 1500 go to gym
+After 5h go to gym
+After 10 h go to gym
+After 24 h go to gym
+After 1500 min go to gym
+After 1500 h go to gym
+After 1500 min go to gym
+After 15 min go to gym
