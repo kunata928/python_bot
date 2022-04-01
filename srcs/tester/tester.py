@@ -1,26 +1,40 @@
-from datetime import datetime
+from datetime import datetime, timedelta
 import re
-
-now = datetime.now()
-print(now)
 
 FILENAME = "test_parser.txt"
 
 
+def set_time(data):
+    now = datetime.now()
+    print("Current time: ", now)
+    if re.search(r"(minutes|minute|min|m)", data["time_type"]):
+        set_time_reminder = datetime.now() + timedelta(minutes=int(data["time"]))
+    elif re.search(r"(hours|hour|h)", data["time_type"]):
+        set_time_reminder = datetime.now() + timedelta(hours=int(data["time"]))
+    print("Reminder time: ", set_time_reminder)
+
+
 def case_after(strr):
-    print(strr)
+    re.search(r'\d+', strr)
+    num = re.search(r'\d+', strr).group()
+    time_type = re.search(r"(hours|minutes|hour|minute|min|h|m)", strr).group()
     try:
-        re.search(r'\d+', strr)
-        num = re.search(r'\d+', strr).group()
+        remains_text = strr[strr.find(time_type) + len(time_type):]
+        if re.search(r"^\s", remains_text):
+            remider_text = 'After {} {} {}.'.format(str(num), str(time_type), remains_text)
+        else:
+            remider_text = 'After {} {} remind.'.format(str(num), str(time_type))
     except:
-        num = -1
-    print(num)
+        remider_text = 'After {} {} remind.'.format(str(num), str(time_type))
+    data_after_parse = {'type': 'after', 'time': num, 'time_type': time_type, 'text': remider_text}
+    print("After parsing: ", data_after_parse)
+    set_time(data_after_parse)
 
 
 def parse_text(strr):
-    if re.search(r'\s*after\s*\d+\s*(hours|minutes|hour|minute|min|h|m|)\s*', strr.lower()):
-        print("after in strr")
-        case_after(strr[strr.lower().find("after") + len("after"):])
+    strr = strr.lower()
+    if re.search(r'\s*after\s*\d+\s*(hours|minutes|hour|minute|min|h|m)\s*', strr):
+        case_after(strr[strr.find("after") + len("after"):])
     elif 0:
         pass
     else:
@@ -43,7 +57,8 @@ def check_tests(filename):
 
 if __name__ == "__main__":
     # res = check_tests(FILENAME)
-    strr = "after 10 min remind make coffee "
+    strr = "After 10 m go to gym"
+    print("Input text: " + strr)
     parse_text(strr)
     # print(str[str.lower().find("after") + len("after"):])
     # res = 0
