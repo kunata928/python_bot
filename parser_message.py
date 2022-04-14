@@ -1,5 +1,4 @@
 from datetime import datetime, timedelta, timezone
-from backports import zoneinfo
 import re
 
 
