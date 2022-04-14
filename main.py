@@ -8,11 +8,12 @@ import schedule
 import time
 import systemtools
 import utils
-import srcs.GeoBot.parser_text_reminder
 MY_ID_CHAT = 273224124
+
 
 sched = BackgroundScheduler()
 bot = telebot.TeleBot(stg.TOKEN_TG_BOT)  # You can set parse_mode by default. HTML or MARKDOWN
+
 
 def return_weather():
     weather0 = requests.get(stg.WEATHER_URL, params=stg.WEATHER_PARAMS0)
@@ -57,6 +58,7 @@ def parse_and_set_remind_job(message):
                               '"After 5 h/min remind to drink water"')
     else:
         data['user_id'] = message.from_user.id
+        print(data)
         set_remind.set_remind_job(data, bot, sched)
 
 
