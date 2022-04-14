@@ -4,10 +4,6 @@ import settings as stg
 import set_remind
 import parser_message
 from apscheduler.schedulers.background import BackgroundScheduler
-import schedule
-import time
-import systemtools
-import utils
 MY_ID_CHAT = 273224124
 
 
