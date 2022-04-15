@@ -1,14 +1,18 @@
-import os
-from dotenv import load_dotenv
+heroku = 1
 
-dotenv_path = os.path.join(os.path.dirname(__file__), '.env')
-print(dotenv_path)
-if os.path.exists(dotenv_path):
-    load_dotenv(dotenv_path=dotenv_path)
-
-TOKEN_TG_BOT = os.environ.get("TOKEN_TG_BOT")
-TOKEN_EXCHANGE = os.environ.get("TOKEN_EXCHANGE")
-TOKEN_WEATHER = os.environ.get("TOKEN_WEATHER")
+if heroku:
+    TOKEN_TG_BOT = process.env.TOKEN_TG_BOT
+    TOKEN_EXCHANGE = process.env.TOKEN_EXCHANGE
+    TOKEN_WEATHER = process.env.TOKEN_WEATHER
+else:
+    import os
+    dotenv_path = os.path.join(os.path.dirname(__file__), '.env')
+    if os.path.exists(dotenv_path):
+        from dotenv import load_dotenv
+        load_dotenv(dotenv_path=dotenv_path)
+    TOKEN_TG_BOT = os.environ.get("TOKEN_TG_BOT")
+    TOKEN_EXCHANGE = os.environ.get("TOKEN_EXCHANGE")
+    TOKEN_WEATHER = os.environ.get("TOKEN_WEATHER")
 
 EXCHANGE_URL = 'https://openexchangerates.org/api/latest.json?app_id='+TOKEN_EXCHANGE
 WEATHER_URL = 'http://api.weatherstack.com/current?access_key='+TOKEN_WEATHER
