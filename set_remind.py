@@ -4,9 +4,9 @@ MY_ID_CHAT = 273224124
 
 
 def send(bot, data):
+    print('ok')
     bot.send_message(data['user_id'], text=data['text'])
     #  bot.send_message(MY_ID_CHAT, text="ok")
-    # print('ok')
 
 
 def set_remind_job(data, bot, sched):
