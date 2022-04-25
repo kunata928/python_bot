@@ -1,27 +1,49 @@
 from apscheduler.schedulers.blocking import BlockingScheduler
-# from apscheduler.schedulers.background import BackgroundScheduler
 from datetime import datetime, timedelta
+import psycopg2
 import main
+import settings as stg
 
-
+db_connection = psycopg2.connect(stg.DB_URI, sslmode="require")
+db_object = db_connection.cursor()
 sched = BlockingScheduler()
-now = datetime.now()
-delta_time = datetime.now() + timedelta(minutes=2)
-# scheduler.add_job(send_message_to_admin, "date", run_date=datetime(2022, 1, 8, 18, 50), args=(bot,))
-# @sched.add_job(send_remind.main(), trigger=, args=None, )
-
-print("now time: ", datetime.now().time().hour, ":", datetime.now().time().minute)
-print("delta time: ", delta_time.time().hour, ":", delta_time.time().minute)
 
 
 @sched.scheduled_job('interval', minutes=1)
 def timed_job():
-    time_now = datetime.now().time()
-    # next_time_remind =
-    if delta_time.time().hour == time_now.hour and delta_time.time().minute == time_now.minute:
-        main.bot.send_message(main.MY_ID_CHAT, text="it work????")
+    now_dt = datetime.now()
+    db_object.execute(f"SELECT user_id, text "
+                      f"FROM reminds "
+                      f"WHERE time = '{now_dt.time().replace(second=0, microsecond=0)}' AND date = '{now_dt.date()}'")
+    result = db_object.fetchall()
+    print(result)
+    if result:
+        # here must be for loop for all of founded reminds!!!!!!!!!!!!!!!!!!!!!!
+        main.bot.send_message(result[0][0], text=result[0][1])
         print('This job is run')
 
 
 sched.start()
 
+
+# -----------add new remind ro table--------- start
+# now = datetime.now()
+# delta_time = now + timedelta(minutes=2)
+
+# db_object.execute(f"SELECT count(id) "
+#                   f"FROM reminds ")
+# id = int(db_object.fetchone()[0]) + 1
+# user_id = main.MY_ID_CHAT
+# time = delta_time.time().replace(second=0, microsecond=0)
+# date = delta_time.date()
+# text = "it work????"
+# db_object.execute("INSERT INTO reminds(id, user_id, time, date, text) VALUES (%s, %s, %s, %s, %s)", (id, user_id, time, date, text))
+# db_connection.commit()
+# -----------add new remind ro table--------- end
+
+# now_dt = datetime.now()
+# db_object.execute(f"SELECT user_id, text "
+#                   f"FROM reminds "
+#                   f"WHERE time = '{now_dt.time().replace(second=0, microsecond=0)}' AND date = '{now_dt.date()}'")
+# result = db_object.fetchall()
+# print(result)

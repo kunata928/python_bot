@@ -3,12 +3,9 @@ import requests
 import settings as stg
 import set_remind
 import parser_message
-# from apscheduler.schedulers.background import BackgroundScheduler
-from apscheduler.schedulers.asyncio import AsyncIOScheduler
+
 MY_ID_CHAT = 273224124
 
-
-sched = AsyncIOScheduler()
 bot = telebot.TeleBot(stg.TOKEN_TG_BOT)  # You can set parse_mode by default. HTML or MARKDOWN
 
 
@@ -34,15 +31,15 @@ def return_rates():
            ", USD->RUB = "+str(rub_rate)+", USD->TRY = "+str(try_rate)
 
 
-def weather(message, bot):
+def weather(message):
     bot.send_message(message.from_user.id, text=return_weather())
 
 
-def currency(message, bot):
+def currency(message):
     bot.send_message(message.from_user.id, text=return_rates())
 
 
-def start(message, bot):
+def start(message):
     bot.send_message(message.from_user.id, text='Hi! I respond to /weather and /currency. Try these!')
 
 
@@ -56,46 +53,46 @@ def parse_and_set_remind_job(message):
         bot.send_message(message.from_user.id, text=data['time_date'])
         data['user_id'] = message.from_user.id
         print(data)
-        set_remind.set_remind_job(data, bot, sched)
+        set_remind.set_remind_job(data)
 
 
-def add_remind(message, bot):
+def add_remind(message):
     print('okay')
     bot.send_message(message.from_user.id, text='If you want to add a remind, type message like: '"<After> <time> <msg>"
-                                                '"After 5 h/min remind to drink water"')
+                                                '" After 5 h/min remind to drink water"')
     bot.register_next_step_handler(message, parse_and_set_remind_job)
 
 
-def show_list_reminds(message, bot):
+def show_list_reminds(messag):
     pass
 
 
-def remove_remind(message, bot):
+def remove_remind(message):
     pass
+
 
 all_commands_dict = {'add': add_remind, 'list': show_list_reminds, 'remove': remove_remind}
+
 
 def main():
     @bot.message_handler(commands=['start', 'help'])
     def send_welcome(message):
-        start(message, bot)
+        start(message)
 
     @bot.message_handler(commands=['add', 'list', 'remove'])
     def set_reminder(message):
-        all_commands_dict[message.text[1:]](message, bot)
+        all_commands_dict[message.text[1:]](message)
 
     @bot.message_handler(func=lambda m: True)
     def echo_all(message):
         if message.text == "/weather":
-            weather(message, bot)
+            weather(message)
         elif message.text == "/currency":
-            currency(message, bot)
+            currency(message)
         else:
-            start(message, bot)
+            start(message)
     bot.infinity_polling()
 
-
-all_commands_dict = {'add': add_remind, 'list': show_list_reminds, 'remove': remove_remind}
 
 if __name__ == '__main__':
     main()
