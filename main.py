@@ -3,6 +3,7 @@ import requests
 import settings as stg
 import set_remind
 import parser_message
+import commands_list_remove as lr
 
 MY_ID_CHAT = 273224124
 
@@ -50,9 +51,9 @@ def parse_and_set_remind_job(message):
                          text='If you want to add a remind, type message like: '"<After> <time> <msg>"
                               '"After 5 h/min remind to drink water"')
     else:
-        bot.send_message(message.from_user.id, text=data['time_date'])
         data['user_id'] = message.from_user.id
-        set_remind.set_remind_job(data)
+        remind_id = set_remind.set_remind_job(data)
+        bot.send_message(message.from_user.id, text="Setted remind with id " + remind_id)
 
 
 def add_remind(message):
@@ -61,8 +62,9 @@ def add_remind(message):
     bot.register_next_step_handler(message, parse_and_set_remind_job)
 
 
-def show_list_reminds(messag):
-    pass
+def show_list_reminds(message):
+    message_text = lr.list_users_reminds(message.from_user.id)
+    bot.send_message(message.from_user.id, text=message_text)
 
 
 def remove_remind(message):

@@ -12,13 +12,16 @@ sched = BlockingScheduler()
 @sched.scheduled_job('interval', minutes=1)
 def timed_job():
     now_dt = datetime.now()
-    db_object.execute(f"SELECT user_id, text "
+    db_object.execute(f"SELECT user_id, text, id "
                       f"FROM reminds "
                       f"WHERE time = '{now_dt.time().replace(second=0, microsecond=0)}' AND date = '{now_dt.date()}'")
     result = db_object.fetchall()
     if result:
         for res in result:
             main.bot.send_message(res[0], text=res[1])
+            sql_delete_query = """DELETE FROM reminds WHERE id = %s"""
+            db_object.execute(sql_delete_query, (res[2],))
+        db_connection.commit()
 
 
 sched.start()

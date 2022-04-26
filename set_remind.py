@@ -16,4 +16,4 @@ def set_remind_job(data):
     db_object.execute("INSERT INTO reminds(id, user_id, time, date, text) VALUES (%s, %s, %s, %s, %s)",
                       (id_table, data['user_id'], time, date, data['text']))
     db_connection.commit()
-    print('set job')
+    return id_table
