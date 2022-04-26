@@ -40,7 +40,7 @@ def currency(message):
 
 
 def start(message):
-    bot.send_message(message.from_user.id, text='Hi! I respond to /weather and /currency. Try these!')
+    bot.send_message(message.from_user.id, text='Hi! I respond to /add /list and /remove reminds. Try these!')
 
 
 def parse_and_set_remind_job(message):
@@ -52,12 +52,10 @@ def parse_and_set_remind_job(message):
     else:
         bot.send_message(message.from_user.id, text=data['time_date'])
         data['user_id'] = message.from_user.id
-        print(data)
         set_remind.set_remind_job(data)
 
 
 def add_remind(message):
-    print('okay')
     bot.send_message(message.from_user.id, text='If you want to add a remind, type message like: '"<After> <time> <msg>"
                                                 '" After 5 h/min remind to drink water"')
     bot.register_next_step_handler(message, parse_and_set_remind_job)
