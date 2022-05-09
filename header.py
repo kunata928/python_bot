@@ -1,0 +1,1 @@
+# data_after_parse = {'type': 'after', 'time': num, 'time_type': time_type, 'text': remider_text}

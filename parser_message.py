@@ -31,12 +31,16 @@ def case_after(strr):
     return set_time(data_after_parse), data_after_parse['text']
 
 
+def case_at(strr):
+    return datetime.now(), "text"
+
+
 def parse_message(strr):
     strr = strr.lower()
     if re.search(r'\s*after\s*\d+\s*(hours|minutes|hour|minute|min|h|m)\s*', strr):
         time_text = case_after(strr[strr.find("after") + len("after"):])
-    elif 0:
-        pass
+    elif re.search(r'\s*at\s*\d+( |:|.)\d*\s\s*'):
+        time_text = case_at(strr[strr.find("at") + len("at"):])
     else:
         return 0
     return {'time_date': time_text[0], 'text': time_text[1]}

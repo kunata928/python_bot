@@ -19,6 +19,8 @@ def list_users_reminds(user_id):
             list_reminds += "You have follow active reminds:\n"
             for res in result:
                 list_reminds += str(res[0]) + " -> " + res[1] + "\n"
+        else:
+            list_reminds += "You have follow active reminds:\n"
     except (Exception, Error) as error:
             print("Error while working with PostgreSQL", error)
     finally:

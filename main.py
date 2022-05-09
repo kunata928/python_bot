@@ -1,11 +1,11 @@
 import telebot
 import settings as stg
+import time_zone as tz
 import command_add_remind
 import commands_list_remove as lr
+from datetime import datetime, timezone
 import weather_rates
-import psycopg2
 from telebot import types
-from psycopg2 import Error
 
 MY_ID_CHAT = 273224124
 bot = telebot.TeleBot(stg.TOKEN_TG_BOT)  # You can set parse_mode by default. HTML or MARKDOWN
@@ -20,7 +20,7 @@ def currency(message):
 
 
 def start(message):
-    bot.send_message(message.from_user.id, text='Hi! I respond to /add /list and /remove reminds. Try these!')
+    bot.send_message(message.from_user.id, text='Hi! I respond to /timezone /add /list and /remove reminds. Try these!')
 
 
 def parse_and_set_remind_job(message):
@@ -29,30 +29,17 @@ def parse_and_set_remind_job(message):
 
 
 def add_remind(message):
-    db_connection = 0
-    try:
-        db_connection = psycopg2.connect(stg.DB_URI, sslmode="require")
-        db_object = db_connection.cursor()
-
-        db_object.execute(f"SELECT count(id) "
-                          f"FROM reminds "
-                          f"WHERE user_id = {message.from_user.id}")
-        result = int(db_object.fetchone()[0])
-        print(result)
-        if result >= 10:
-            bot.send_message(message.from_user.id, text='You reach the limit reminds. /remove some reminds')
-        else:
-            bot.send_message(message.from_user.id,
-                             text='If you want to add a remind, type message like: '"<After> <time> <msg>"
-                                  '" After 5 h/min remind to drink water"')
-            bot.register_next_step_handler(message, parse_and_set_remind_job)
-    except (Exception, Error) as error:
-        print("Error while working with PostgreSQL", error)
-    finally:
-        if db_connection:
-            db_object.close()
-            db_connection.close()
-            print("Connection with PostgreSQL closed")
+    result = command_add_remind.count_reminds_for_user(message.from_user.id)
+    print(result)
+    if result == -1:
+        bot.send_message(message.from_user.id, text='There is some troubles with bot :(')
+    elif result >= 7:
+        bot.send_message(message.from_user.id, text='You reach the limit of reminds. /remove some reminds')
+    else:
+        bot.send_message(message.from_user.id,
+                         text='If you want to add a remind, type message like: '"<After> <time> <msg>"
+                              '" After 5 h/min remind to drink water"')
+        bot.register_next_step_handler(message, parse_and_set_remind_job)
 
 
 def show_list_reminds(message):
@@ -72,7 +59,21 @@ def remove_remind(message):
         bot.send_message(message.from_user.id, text="You have no reminds. Try /add command!")
 
 
-all_commands_dict = {'add': add_remind, 'list': show_list_reminds, 'remove': remove_remind}
+def set_new_tz(message):
+    text_message = tz.set_tz_DB(message.from_user.id, message.text)
+    bot.send_message(message.from_user.id, text=text_message)
+
+
+def change_tz(message):
+    # LOCAL_TIMEZONE = datetime.now(timezone.utc).astimezone().tzinfo
+    user_tz = tz.show_user_tz(message.from_user.id)
+    sign = '+' if user_tz >= 0 else ''
+    bot.send_message(message.from_user.id, text="Now your timezone is UTC " + sign + str(user_tz) + " \n" +
+                     "Input new timezone (for example +3 or -11):")
+    bot.register_next_step_handler(message, set_new_tz)
+
+
+all_commands_dict = {'add': add_remind, 'list': show_list_reminds, 'remove': remove_remind, 'timezone': change_tz}
 
 
 def main():
@@ -80,7 +81,7 @@ def main():
     def send_welcome(message):
         start(message)
 
-    @bot.message_handler(commands=['add', 'list', 'remove'])
+    @bot.message_handler(commands=['add', 'list', 'remove', 'timezone'])
     def set_reminder(message):
         all_commands_dict[message.text[1:]](message)
 

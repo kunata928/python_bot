@@ -28,7 +28,7 @@ def set_remind_job(data):
     return id_table
 
 
-def message_processing(message):
+def message_processing(message): #after user input remind check if valid - add remind; else give notification
     data = parser_message.parse_message(message.text)
     if not data:
         text = 'If you want to add a remind, type message like: '"<After> <time> <msg> " \
@@ -38,3 +38,23 @@ def message_processing(message):
         remind_id = set_remind_job(data)
         text = "Set remind with id " + str(remind_id)
     return text
+
+
+def count_reminds_for_user(user_id): #to count reminds for user to check limit
+    db_connection = 0
+    result = -1
+    try:
+        db_connection = psycopg2.connect(stg.DB_URI, sslmode="require")
+        db_object = db_connection.cursor()
+        db_object.execute(f"SELECT count(id) "
+                          f"FROM reminds "
+                          f"WHERE user_id = {user_id}")
+        result = int(db_object.fetchone()[0])
+    except (Exception, Error) as error:
+        print("Error while working with PostgreSQL", error)
+    finally:
+        if db_connection:
+            db_object.close()
+            db_connection.close()
+            print("Connection with PostgreSQL closed")
+    return result
