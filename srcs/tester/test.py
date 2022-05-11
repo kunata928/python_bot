@@ -1,6 +1,6 @@
 import pytz
 import telebot
-from datetime import datetime, timezone
+from datetime import datetime, timezone, timedelta
 
 
 # MY_ID_CHAT = 273224124
@@ -19,8 +19,9 @@ from datetime import datetime, timezone
 #
 # if current_time == '17:30:00':
 #     test_send_message()
-LOCAL_TIMEZONE = datetime.now(timezone.utc).astimezone().tzinfo
+LOCAL_TIMEZONE = datetime.now(timezone.utc).astimezone().tzinfo#int(str(LOCAL_TIMEZONE))
 
 tz = pytz.all_timezones
-
-print(LOCAL_TIMEZONE)
+date = datetime.now().date()
+time = datetime(hour=4, minute=20, year=date.year, month=date.month, day=date.day)
+print(time)
