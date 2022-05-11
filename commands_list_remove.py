@@ -1,7 +1,6 @@
 import psycopg2
 from psycopg2 import Error
 import settings as stg
-MY_ID_CHAT = 273224124
 
 
 def list_users_reminds(user_id):

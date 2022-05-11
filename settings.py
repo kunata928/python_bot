@@ -1,5 +1,6 @@
 import os
 from boto.s3.connection import S3Connection
+from datetime import datetime, timezone, timedelta
 
 s3 = S3Connection(os.environ['S3_KEY'], os.environ['S3_SECRET'])
 
@@ -14,3 +15,8 @@ WEATHER_URL = 'http://api.weatherstack.com/current?access_key='+TOKEN_WEATHER
 WEATHER_PARAMS0 = {'query':'Istanbul'}
 WEATHER_PARAMS1 = {'query':'Krakow'}
 WEATHER_PARAMS2 = {'query':'Moskva'}
+
+DEFAULT_TIMEZONE = +3
+LOCAL_TIMEZONE = datetime.now(timezone.utc).astimezone().tzinfo
+
+REMINDS_LIMIT = 7

@@ -3,7 +3,6 @@ import settings as stg
 import time_zone as tz
 import command_add_remind
 import commands_list_remove as lr
-from datetime import datetime, timezone
 import weather_rates
 from telebot import types
 
@@ -33,12 +32,13 @@ def add_remind(message):
     print(result)
     if result == -1:
         bot.send_message(message.from_user.id, text='There is some troubles with bot :(')
-    elif result >= 7:
+    elif result >= stg.REMINDS_LIMIT:
         bot.send_message(message.from_user.id, text='You reach the limit of reminds. /remove some reminds')
     else:
         bot.send_message(message.from_user.id,
-                         text='If you want to add a remind, type message like: '"<After> <time> <msg>"
-                              '" After 5 h/min remind to drink water"')
+                         text='If you want to add a remind, type message like: \n"<After/At> <time> <msg>" \n'
+                              '"After 5 h/min remind to drink water"\n'
+                              '"At 18.30 go to home"\n')
         bot.register_next_step_handler(message, parse_and_set_remind_job)
 
 
@@ -51,9 +51,9 @@ def remove_remind(message):
     list_reminds = lr.list_users_reminds(message.from_user.id).split('\n')[1:-1]
     if list_reminds:
         inline_kb_full = types.InlineKeyboardMarkup(row_width=1)
-        for l in list_reminds:
-            inline_kb_full.add(types.InlineKeyboardButton(l, callback_data='btn_id'+str(l.split()[0])))
-            print('btn_id'+str(l.split()[0]))
+        for remind in list_reminds:
+            inline_kb_full.add(types.InlineKeyboardButton(remind, callback_data='btn_id'+str(remind.split()[0])))
+            print('btn_id'+str(remind.split()[0]))
         bot.send_message(message.from_user.id, text='Choose remind you want to delete:', reply_markup=inline_kb_full)
     else:
         bot.send_message(message.from_user.id, text="You have no reminds. Try /add command!")
@@ -65,7 +65,6 @@ def set_new_tz(message):
 
 
 def change_tz(message):
-    # LOCAL_TIMEZONE = datetime.now(timezone.utc).astimezone().tzinfo
     user_tz = tz.show_user_tz(message.from_user.id)
     sign = '+' if user_tz >= 0 else ''
     bot.send_message(message.from_user.id, text="Now your timezone is UTC " + sign + str(user_tz) + " \n" +
@@ -96,7 +95,7 @@ def main():
 
     @bot.callback_query_handler(func=lambda c: c.data and c.data.startswith('btn_id'))
     def process_callback_kb1btn1(callback_query: types.CallbackQuery):
-        id_remind = int(callback_query.data[6:])
+        id_remind = int(callback_query.data[len('btn_id'):])
         status = lr.remove_remind(id_remind)
         if status:
             bot.send_message(callback_query.from_user.id, text='success')

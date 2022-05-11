@@ -1,5 +1,4 @@
 from datetime import datetime, timedelta
-# import pytz
 import re
 
 
@@ -28,19 +27,34 @@ def case_after(strr):
         remider_text = 'After {} {} remind.'.format(str(num), str(time_type))
     data_after_parse = {'type': 'after', 'time': num, 'time_type': time_type, 'text': remider_text}
     print("After parsing: ", data_after_parse)
-    return set_time(data_after_parse), data_after_parse['text']
+    return "after", set_time(data_after_parse), data_after_parse['text']
 
 
 def case_at(strr):
-    return datetime.now(), "text"
+    date = datetime.now().date()
+    res = re.search(r'\s*at\s*([0-9]|0[0-9]|1[0-9]|2[0-3])[:.\-, ]([0-5][0-9])(.*)', strr)
+    if res:
+        date_time = datetime(hour=int(res.group(1)), minute=int(res.group(2)),
+                             year=date.year, month=date.month, day=date.day)
+    else:
+        date_time = datetime.now()
+    print(date_time)
+    return "at", date_time, res.group(3)
 
 
 def parse_message(strr):
     strr = strr.lower()
     if re.search(r'\s*after\s*\d+\s*(hours|minutes|hour|minute|min|h|m)\s*', strr):
         time_text = case_after(strr[strr.find("after") + len("after"):])
-    elif re.search(r'\s*at\s*\d+( |:|.)\d*\s\s*'):
-        time_text = case_at(strr[strr.find("at") + len("at"):])
+    elif re.search(r'\s*at\s*([0-9]|0[0-9]|1[0-9]|2[0-3])[:.\-, ]([0-5][0-9])(.*)', strr):
+        time_text = case_at(strr)
     else:
         return 0
-    return {'time_date': time_text[0], 'text': time_text[1]}
+    return {'type': time_text[0], 'time_date': time_text[1], 'text': time_text[2]}
+
+# выделить цифры
+# вытянуть таймзону из бд
+# по формуле установить время в бд
+# # время в бд = время из сообщения - таймзона юзера
+# скорректировать шедулер: now_dt - должно быть в UTC
+# скоррректировать запись в бд для after (должно быть -tz локального устройства)

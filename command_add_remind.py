@@ -1,8 +1,9 @@
 import psycopg2
 from psycopg2 import Error
 import settings as stg
+from datetime import datetime, timezone, timedelta
+import settings as stg
 import parser_message
-MY_ID_CHAT = 273224124
 
 
 def set_remind_job(data):
@@ -13,12 +14,20 @@ def set_remind_job(data):
         db_object = db_connection.cursor()
         db_object.execute(f"SELECT nextval('serialIDS');")
         id_table = db_object.fetchone()[0]
+        if data['type'] == 'at':
+            db_object.execute(f"SELECT tz FROM users WHERE id = {data['user_id']}")
+            res = db_object.fetchone()
+            delta = timedelta(hours=res[0]) if res else timedelta(hours=int(stg.DEFAULT_TIMEZONE))
+        else:
+            delta = timedelta(hours=int(str(stg.LOCAL_TIMEZONE)))
+        data['time_date'] = data['time_date'] - delta
         time = data['time_date'].time().replace(second=0, microsecond=0)
         date = data['time_date'].date()
         db_object.execute("INSERT INTO reminds(id, user_id, time, date, text) VALUES (%s, %s, %s, %s, %s)",
                           (id_table, data['user_id'], time, date, data['text']))
         db_connection.commit()
     except (Exception, Error) as error:
+        id_table = 0
         print("Error while working with PostgreSQL", error)
     finally:
         if db_connection:

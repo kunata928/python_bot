@@ -1,11 +1,12 @@
 from apscheduler.schedulers.background import BlockingScheduler
-from datetime import datetime
+from datetime import datetime, timezone, timedelta
 import psycopg2
 from psycopg2 import Error
 import main
 import settings as stg
 
 db_connection = 0
+LOCAL_TIMEZONE = datetime.now(timezone.utc).astimezone().tzinfo
 
 try:
     sched = BlockingScheduler()
@@ -16,7 +17,8 @@ try:
 
     @sched.scheduled_job('interval', minutes=1)
     def timed_job():
-        now_dt = datetime.now()
+        now_dt = datetime.now() - timedelta(hours=int(str(stg.LOCAL_TIMEZONE)))
+        print(now_dt.time().replace(second=0, microsecond=0))
         db_object.execute(f"SELECT user_id, text, id "
                           f"FROM reminds "
                           f"WHERE time = '{now_dt.time().replace(second=0, microsecond=0)}' AND date = '{now_dt.date()}'")
