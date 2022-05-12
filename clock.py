@@ -14,7 +14,6 @@ try:
     db_connection = psycopg2.connect(stg.DB_URI, sslmode="require")
     db_object = db_connection.cursor()
 
-
     @sched.scheduled_job('interval', minutes=1)
     def timed_job():
         now_dt = datetime.now() - timedelta(hours=int(str(stg.LOCAL_TIMEZONE)))

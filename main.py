@@ -19,7 +19,8 @@ def currency(message):
 
 
 def start(message):
-    bot.send_message(message.from_user.id, text='Hi! I respond to /timezone /add /list and /remove reminds. Try these!')
+    bot.send_message(message.from_user.id, text='Hi! I respond to:\n/add /list and /remove reminds.\nAlso I can '
+                                                'set your /timezone. Default is UTC +3.  Try these!')
 
 
 def parse_and_set_remind_job(message):
