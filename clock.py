@@ -16,6 +16,7 @@ try:
 
     @sched.scheduled_job('interval', minutes=1)
     def timed_job():
+
         now_dt = datetime.now() - timedelta(hours=int(str(stg.LOCAL_TIMEZONE)))
         print(now_dt.time().replace(second=0, microsecond=0))
         db_object.execute(f"SELECT user_id, text, id "
