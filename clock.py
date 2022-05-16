@@ -4,6 +4,7 @@ import psycopg2
 from psycopg2 import Error
 import main
 import settings as stg
+import re
 
 db_connection = 0
 LOCAL_TIMEZONE = datetime.now(timezone.utc).astimezone().tzinfo
@@ -16,8 +17,8 @@ try:
 
     @sched.scheduled_job('interval', minutes=1)
     def timed_job():
-
-        now_dt = datetime.now() - timedelta(hours=int(str(stg.LOCAL_TIMEZONE)))
+        tz_hour = int(re.search(r'[+-]\d*', str(LOCAL_TIMEZONE)).group())
+        now_dt = datetime.now() - timedelta(hours=tz_hour)
         print(now_dt.time().replace(second=0, microsecond=0))
         db_object.execute(f"SELECT user_id, text, id "
                           f"FROM reminds "

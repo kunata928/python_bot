@@ -29,5 +29,5 @@ from datetime import datetime, timezone, timedelta
 # print(time)
 
 
-LOCAL_TIMEZONE = datetime.now(timezone.utc).astimezone().tzinfo
-print(LOCAL_TIMEZONE)
+LOCAL_TIMEZONE = "-04"#datetime.now(timezone.utc).astimezone().tzinfo
+print(int(re.search(r'[+-]\d*', str(LOCAL_TIMEZONE)).group()))
