@@ -1,14 +1,12 @@
 from apscheduler.schedulers.background import BlockingScheduler
-from datetime import datetime, timezone, timedelta
+from datetime import datetime
 import psycopg2
 from psycopg2 import Error
 import main
 import settings as stg
-import re
+
 
 db_connection = 0
-LOCAL_TIMEZONE = datetime.now(timezone.utc).astimezone().tzinfo
-
 try:
     sched = BlockingScheduler()
 
@@ -17,20 +15,17 @@ try:
 
     @sched.scheduled_job('interval', minutes=1)
     def timed_job():
-        # tz_hour = int(re.search(r'[+-]\d*', str(LOCAL_TIMEZONE)).group())
-        # now_dt = datetime.now() - timedelta(hours=tz_hour)
-        main.bot.send_message(273224124, text=LOCAL_TIMEZONE)
-        # print(now_dt.time().replace(second=0, microsecond=0))
-        # db_object.execute(f"SELECT user_id, text, id "
-        #                   f"FROM reminds "
-        #                   f"WHERE time = '{now_dt.time().replace(second=0, microsecond=0)}' AND date = '{now_dt.date()}'")
-        # result = db_object.fetchall()
-        # if result:
-        #     for res in result:
-        #         main.bot.send_message(res[0], text=res[1])
-        #         sql_delete_query = """DELETE FROM reminds WHERE id = %s"""
-        #         db_object.execute(sql_delete_query, (res[2],))
-        #     db_connection.commit()
+        now_dt = datetime.utcnow()
+        db_object.execute(f"SELECT user_id, text, id "
+                          f"FROM reminds "
+                          f"WHERE time = '{now_dt.time().replace(second=0, microsecond=0)}' AND date = '{now_dt.date()}'")
+        result = db_object.fetchall()
+        if result:
+            for res in result:
+                main.bot.send_message(res[0], text=res[1])
+                sql_delete_query = """DELETE FROM reminds WHERE id = %s"""
+                db_object.execute(sql_delete_query, (res[2],))
+            db_connection.commit()
 
     sched.start()
 
