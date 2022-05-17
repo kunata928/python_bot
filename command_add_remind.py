@@ -1,6 +1,5 @@
 import psycopg2
 from psycopg2 import Error
-import settings as stg
 from datetime import datetime, timezone, timedelta
 import settings as stg
 import parser_message
