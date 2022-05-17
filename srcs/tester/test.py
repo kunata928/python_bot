@@ -30,4 +30,6 @@ from datetime import datetime, timezone, timedelta
 
 
 LOCAL_TIMEZONE = "-04"#datetime.now(timezone.utc).astimezone().tzinfo
-print(int(re.search(r'[+-]\d*', str(LOCAL_TIMEZONE)).group()))
+local_timezone = datetime.utcnow().time()
+
+print(local_timezone)
