@@ -30,7 +30,6 @@ def parse_and_set_remind_job(message):
 
 def add_remind(message):
     result = command_add_remind.count_reminds_for_user(message.from_user.id)
-    print(result)
     if result == -1:
         bot.send_message(message.from_user.id, text='There is some troubles with bot :(')
     elif result >= stg.REMINDS_LIMIT:
@@ -54,7 +53,6 @@ def remove_remind(message):
         inline_kb_full = types.InlineKeyboardMarkup(row_width=1)
         for remind in list_reminds:
             inline_kb_full.add(types.InlineKeyboardButton(remind, callback_data='btn_id'+str(remind.split()[0])))
-            print('btn_id'+str(remind.split()[0]))
         bot.send_message(message.from_user.id, text='Choose remind you want to delete:', reply_markup=inline_kb_full)
     else:
         bot.send_message(message.from_user.id, text="You have no reminds. Try /add command!")

@@ -3,9 +3,10 @@ from psycopg2 import Error
 from datetime import datetime, timezone, timedelta
 import settings as stg
 import parser_message
+import time_zone as tz
 
 
-def set_remind_job(data):
+def set_remind_job(data): #Correct time and Insert remind into DB table 'reminds'
     id_table = 0
     db_connection = 0
     try:
@@ -13,13 +14,6 @@ def set_remind_job(data):
         db_object = db_connection.cursor()
         db_object.execute(f"SELECT nextval('serialIDS');")
         id_table = db_object.fetchone()[0]
-        if data['type'] == 'at':
-            db_object.execute(f"SELECT tz FROM users WHERE id = {data['user_id']}")
-            res = db_object.fetchone()
-            delta = timedelta(hours=res[0]) if res else timedelta(hours=int(stg.DEFAULT_TIMEZONE))
-        else:
-            delta = timedelta(hours=int(str(stg.LOCAL_TIMEZONE)))
-        data['time_date'] = data['time_date'] - delta
         time = data['time_date'].time().replace(second=0, microsecond=0)
         date = data['time_date'].date()
         db_object.execute("INSERT INTO reminds(id, user_id, time, date, text) VALUES (%s, %s, %s, %s, %s)",
@@ -37,7 +31,8 @@ def set_remind_job(data):
 
 
 def message_processing(message): #after user input remind check if valid - add remind; else give notification
-    data = parser_message.parse_message(message.text)
+    user_tz = tz.show_user_tz(message.from_user.id)
+    data = parser_message.parse_message(message.text, user_tz)
     if not data:
         text = 'If you want to add a remind, type message like: '"<After> <time> <msg> " \
              "After 5 h/min remind to drink water"

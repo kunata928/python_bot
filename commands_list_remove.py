@@ -19,7 +19,7 @@ def list_users_reminds(user_id):
             for res in result:
                 list_reminds += str(res[0]) + " -> " + res[1] + "\n"
         else:
-            list_reminds += "You have no active reminds :( \nTry /add comand!\n"
+            list_reminds += "You have no active reminds :(  Try /add comand!\n"
     except (Exception, Error) as error:
             print("Error while working with PostgreSQL", error)
     finally:

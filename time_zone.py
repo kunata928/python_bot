@@ -16,7 +16,7 @@ def show_user_tz(user_id):
         if res:
             result = int(res[0])
         else:
-            result = 0
+            result = stg.DEFAULT_TIMEZONE
     except (Exception, Error) as error:
         print("Error while working with PostgreSQL", error)
     finally:
